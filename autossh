@@ -1,0 +1,54 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          autossh
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: starts the autossh connection to amigobooth
+# Description:       starts autossh using start-stop-daemon
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/bin/autossh
+DAEMON_OPTS='-N -o BatchMode=yes -o StrictHostKeyChecking=no -i /home/pi/.ssh/id_rsa -R PORT:localhost:22 USERNAME@homebase.amigobooth.com'
+NAME=autossh
+DESC=autossh
+PID=/tmp/autossh.pid
+USERNAME=pi
+
+test -x $DAEMON || exit 0
+
+set -e
+
+. /lib/lsb/init-functions
+
+case "$1" in
+  start)
+    echo -n "Starting $DESC: "
+    start-stop-daemon --start --quiet --chuid $USERNAME --background --pidfile $PID --exec $DAEMON -- $DAEMON_OPTS || true
+    echo "$NAME."
+    ;;
+
+  stop)
+    echo -n "Stopping $DESC: "
+    start-stop-daemon --stop --quiet --chuid $USERNAME --background --pidfile $PID --exec $DAEMON || true
+    echo "$NAME."
+    ;;
+
+  restart|force-reload)
+    echo -n "Restarting $DESC: "
+    start-stop-daemon --stop --quiet --chuid $USERNAME --background --pidfile $PID --exec $DAEMON || true
+    sleep 1
+    start-stop-daemon --start --quiet --chuid $USERNAME --background --pidfile $PID --exec $DAEMON -- $DAEMON_OPTS || true
+    echo "$NAME."
+    ;;
+
+  *)
+    echo "Usage: $NAME {start|stop|restart}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
