@@ -16,7 +16,7 @@ DAEMON_OPTS='-N -o BatchMode=yes -o StrictHostKeyChecking=no -i /home/pi/.ssh/id
 NAME=autossh
 DESC=autossh
 PID=/tmp/autossh.pid
-USERNAME=pi
+USERNAME=amigo
 
 test -x $DAEMON || exit 0
 
